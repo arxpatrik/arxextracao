@@ -39,7 +39,7 @@ ANO_INICIO           = 2025       # Ano de início
 MES_INICIO           = 5          # Mês de início
 
 # Paginação
-REGISTROS_POR_PAGINA = 3000       # Quantidade de registros retornados por página da API
+REGISTROS_POR_PAGINA = 500       # Quantidade de registros retornados por página da API
 
 # Mapeamento de códigos de situação da API → rótulos legíveis
 MAPA_SITUACAO_BOLETO = {
@@ -404,7 +404,7 @@ def processar_paginas_de_boletos(
             if pagina_atual >= total_paginas:
                 break
 
-            time.sleep(1.0)  # Proteção firewall Ancore (max 1 req/s)
+            time.sleep(3)  # Proteção firewall Ancore (max 1 req/s)
 
         except Exception as erro:
             print(f"[{NOME_EMPRESA}] Exceção durante '{descricao}': {erro}")
