@@ -62,20 +62,30 @@ for protocolo in protocolos:
                 senha_input.type("Arx5050", delay=100)
 
                 page.keyboard.press("Enter")
-                time.sleep(2) # Respiro pós-enter
-                page.locator("button[type='submit']").wait_for(state="attached")
-                page.locator("button[type='submit']").click(force=True)
+                time.sleep(2)
 
                 # Fechar Modal
                 try:
-                    # 1. Garantia matemática que o login concluiu o carregamento
-                    try:
-                        page.locator("#navbar8").wait_for(state="visible", timeout=25000)
-                    except:
-                        pass
+                    page.mouse.move(960, 540)  # centro da tela 1920x1080
+                    time.sleep(3)  # Espera o modal carregar após o login
 
-                    # 2. Respiro leve de frontend pro modal começar a brotar (caso o site esteja engasgando)
-                    time.sleep(1)
+                    modal_comunicado = page.locator("#myModal:has-text('Comunicado Importante')")
+
+                    if modal_comunicado.is_visible():
+                        print("Modal 'Comunicado Importante' detectado! Pressionando Tab 55x para navegar até o botão Fechar...")
+                        for i in range(49):
+                            page.keyboard.press("Tab")  # "Tab" com T maiúsculo é obrigatório no Playwright!
+                            print(f"  Tab {i+1}/49")
+                            time.sleep(0.1)
+
+                        print("Pressionando Enter para confirmar o foco no botão Fechar...")
+                        page.keyboard.press("Enter")  # "Enter" com E maiúsculo é obrigatório no Playwright!
+                        time.sleep(1)
+                    else:
+                        print("[+] Modal 'Comunicado Importante' não detectado. Pulando Tabs.")
+
+
+
                     
                     modal = page.locator("#myModal")
                     
@@ -137,6 +147,7 @@ for protocolo in protocolos:
                     page.locator("#load").wait_for(state="visible", timeout=3000)
                 except:
                     pass
+
                 page.locator("#load").wait_for(state="hidden", timeout=120000)
                 time.sleep(2) # Respiro de precaução final após grid carregar
 
