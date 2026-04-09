@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python ancore_cancelamento.py)",
+      "Bash(python ancore_veiculo_cadastro.py)",
+      "Bash(timeout 90 python \"c:\\\\Users\\\\conan.costa\\\\Desktop\\\\arxextracao\\\\ancore_cancelamento.py\")"
+    ]
+  }
+}
