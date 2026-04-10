@@ -178,29 +178,38 @@ for protocolo in protocolos:
 
                             nova_aba.locator("button[data-target='#historicosEventoVeiculo']").click()
                             time.sleep(3) # Respiro da expansão do accordion
-                            
-                            # Lista com variações e proteções contra erros de ortografia do sistema
-                            palavras_chave = [
-                                "dados da analise", "dados da análise",
-                                "dados de analise", "dados de análise",
-                                "parecer juridico", "parecer jurídico",
-                                "conclusao", "conclusão",
-                                "possibilidades"
-                            ]
-                            
-                            # Transforma a lista de forma dinâmica no seletor múltiplo (isto OU aquilo OU aquele)
-                            seletor_multiplo = ", ".join([f"td:has-text('{p}')" for p in palavras_chave])
-                            td_dados = nova_aba.locator(seletor_multiplo).first
-                            
-                            texto_extraido = "Sem informacao do juridico." # Fallback Padrão
+
+                            texto_extraido = "Sem historico." # Fallback Padrao
 
                             try:
-                                print("[*] Inspecionando a tela em busca de Pareceres, Conclusões ou Dados da Análise...")
-                                td_dados.wait_for(state="visible", timeout=10000)
-                                texto_extraido = td_dados.inner_text()
-                                print(f"[+] Informação encontrada e extraída com sucesso!")
-                            except Exception:
-                                print(f"ℹ Nenhuma das opções da lista foi detectada para este protocolo. Usando mensagem padrão.")
+                                print("[*] Extraindo historico completo do evento...")
+                                tabela = nova_aba.locator("#historicosEventoVeiculo table tbody")
+                                tabela.wait_for(state="visible", timeout=10000)
+
+                                linhas_hist = tabela.locator("tr")
+                                total_hist  = linhas_hist.count()
+                                blocos      = []
+
+                                for h in range(total_hist):
+                                    cols = linhas_hist.nth(h).locator("td")
+                                    usuario  = cols.nth(0).inner_text().strip()
+                                    descricao = cols.nth(1).inner_text().strip()
+                                    situacao  = cols.nth(2).inner_text().strip()
+                                    data_h    = cols.nth(3).inner_text().strip()
+                                    hora_h    = cols.nth(4).inner_text().strip()
+
+                                    blocos.append(
+                                        f"[{data_h} {hora_h}] {usuario} | {situacao}\n{descricao}"
+                                    )
+
+                                if blocos:
+                                    texto_extraido = "\n\n---\n\n".join(blocos)
+                                    print(f"[+] {total_hist} entradas do historico extraidas com sucesso!")
+                                else:
+                                    print("[*] Historico vazio para este protocolo.")
+
+                            except Exception as e:
+                                print(f"[!] Erro ao extrair historico: {e}. Usando fallback.")
                             
                             # Realiza a gravação no banco independente se extraiu ou usou fallback
                             try:
